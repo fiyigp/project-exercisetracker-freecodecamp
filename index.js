@@ -17,9 +17,9 @@ app.get('/', (req, res) => {
 
 app.post('/api/users', (req, res) => {
   const user = req.body.username;
-  const id = Object.entries(users).length + 1;
+  const id = String(Object.entries(users).length + 1);
   users[id] = {username: user, _id: id};
-  res.json({username: user, _id: id});
+  res.json(users[id]);
 });
 
 app.get('/api/users', (req, res) => {
@@ -29,22 +29,24 @@ app.get('/api/users', (req, res) => {
 app.post('/api/users/:_id/exercises', (req, res) => {
   const user = users[req.params._id];
   const date = (req.params.date) ? new Date(req.params.date) : new Date();
-  const exercise = {description: req.body.description, duration: req.body.duration, date: date.toDateString()}
+  const exercise = {description: req.body.description, duration: parseInt(req.body.duration), date: date.toDateString()}
   
   if (exercises[user._id] === undefined) {
     exercises[user._id] = []; 
   }
 
   exercises[user._id].push(exercise);
-  exercise.username = user.username;
-  exercise._id = user._id;
+  user.description = exercise.description;
+  user.duration = exercise.duration;
+  user.date = exercise.date;
 
-  res.json();
+  res.json(user);
 });
 
 app.get('/api/users/:_id/logs', (req, res) => {
   const user = users[req.params._id];
   const userExercises = exercises[user._id];
+  console.log(userExercises);;
   
   res.json({username: user.username, _id: user._id, count: userExercises.length, log: userExercises});
 });
