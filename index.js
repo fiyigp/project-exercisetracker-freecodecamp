@@ -59,7 +59,7 @@ app.get('/api/users/:_id/logs', (req, res) => {
     const limitExercises = (req.query.limit != undefined) ? req.query.limit : userExercises.length;
     userExercises.forEach(exercise => {
       const exerciseDate = new Date(exercise.date);
-      if (exerciseDate.getTime() > fromFilter.getTime() && exerciseDate.getTime() < toFilter.getTime()) {
+      if (exerciseDate.getTime() >= fromFilter.getTime() && exerciseDate.getTime() <= toFilter.getTime()) {
         if (userExercisesFiltered.length < limitExercises) {
           userExercisesFiltered.push(exercise);
         }
