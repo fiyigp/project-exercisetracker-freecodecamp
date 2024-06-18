@@ -46,9 +46,34 @@ app.post('/api/users/:_id/exercises', (req, res) => {
 app.get('/api/users/:_id/logs', (req, res) => {
   const user = users[req.params._id];
   const userExercises = exercises[user._id];
-  console.log(userExercises);;
   
-  res.json({username: user.username, _id: user._id, count: userExercises.length, log: userExercises});
+  if (req.query.from != undefined && req.query.to != undefined) {
+    const userExercisesFiltered = [];
+    
+    if (isNaN(req.query.limit) && req.query.limit != undefined) {
+      res.json({error: "limit is not a number"});
+    }
+    
+    const limitExercises = (req.query.limit != undefined) ? req.query.limit : userExercises.length;
+    
+    userExercises.forEach(exercise => {
+      if (exercise.date > req.query.from && exercise.date < req.query.to) {
+        if (userExercisesFiltered.length < limitExercises) {
+          userExercisesFiltered.push(exercise);
+        }
+      }
+    });
+
+    res.json({username: user.username, _id: user._id, count: userExercises.length, log: userExercisesFiltered});
+  } else {
+    if (isNaN(req.query.limit) && req.query.limit != undefined) {
+      res.json({error: "limit is not a number"});
+    }
+    
+    const limitExercises = (req.query.limit != undefined) ? req.query.limit : userExercises.length;
+    
+    res.json({username: user.username, _id: user._id, count: userExercises.length, log: userExercises.slice(0,limitExercises)});
+  }
 });
 
 const listener = app.listen(process.env.PORT || 3000, () => {
