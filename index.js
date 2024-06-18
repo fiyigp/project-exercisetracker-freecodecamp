@@ -49,6 +49,8 @@ app.get('/api/users/:_id/logs', (req, res) => {
   
   if (req.query.from != undefined && req.query.to != undefined) {
     const userExercisesFiltered = [];
+    const fromFilter = new Date(req.query.from + "00:00:00");
+    const toFilter = new Date(req.query.to + "00:00:00");
     
     if (isNaN(req.query.limit) && req.query.limit != undefined) {
       res.json({error: "limit is not a number"});
@@ -56,7 +58,8 @@ app.get('/api/users/:_id/logs', (req, res) => {
     
     const limitExercises = (req.query.limit != undefined) ? req.query.limit : userExercises.length;
     userExercises.forEach(exercise => {
-      if (exercise.date > req.query.from && exercise.date < req.query.to) {
+      const exerciseDate = new Date(exercise.date);
+      if (exerciseDate.getTime() > fromFilter.getTime() && exerciseDate.getTime() < toFilter.getTime()) {
         if (userExercisesFiltered.length < limitExercises) {
           userExercisesFiltered.push(exercise);
         }
